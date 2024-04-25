@@ -15,7 +15,7 @@ public class DataStreamsCams {
 
     public static void main(String[] args) {
         String settingsFilePath = "src/main/resource/settings.dat";
-        final String dataStreamsFilePath = "src/main/resource/dataStreams3.dat";
+        final String dataStreamsFilePath = "src/main/resource/dataStreams4.dat";
 
         // Scanner scanner = new Scanner(System.in);
         Map<String, String> variables = new HashMap<>();
@@ -28,7 +28,7 @@ public class DataStreamsCams {
 
         final int FAN_OUT = Integer.parseInt(variables.get("FAN_OUT"));
 
-        for (int i = 0; i < 300000; i++) {
+        for (int i = 0; i < 400000; i++) {
             generateDataStreamsCams(dataStreamsFilePath, cubeSize, FAN_OUT);
         }
     }
