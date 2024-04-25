@@ -27,7 +27,9 @@ public class DataStructure {
         }
 
         final int cubeSize = Integer.parseInt(variables.get("CUBE_SIZE"));
-        CubeUniform cube = new CubeUniform(cubeSize, 5, 100);
+        final int UMIN = Integer.parseInt(variables.get("UMIN"));
+        final int UMAX = Integer.parseInt(variables.get("UMAX"));
+        CubeUniform cube = new CubeUniform(cubeSize, UMIN, UMAX);
         cube.generateCube();
 
         final int FAN_OUT = Integer.parseInt(variables.get("FAN_OUT"));
@@ -112,16 +114,14 @@ public class DataStructure {
                     }
                 }
                 nextLevel.add(parent);
-                if(i<1){
+            }
+            currentLevel = nextLevel;
+            if(depth>1){
+                depth--;
                     int size=row/fanOut+1;
                     System.out.println();
                     fanOut = ((int) Math.pow(size, 1/depth))+1;
-                    System.out.println("-----//"+ depth);
-                    depth--;
-
                 }
-            }
-            currentLevel = nextLevel;
         }
         return currentLevel.get(0); // Return the root node
     }
