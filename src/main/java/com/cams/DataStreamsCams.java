@@ -1,7 +1,5 @@
 package com.cams;
-
-import java.util.ArrayList;
-import java.util.List;
+ 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -10,17 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.io.FileWriter;
 import java.util.Random;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+
 
 public class DataStreamsCams {
     public static int charNum = 1;
 
     public static void main(String[] args) {
         String settingsFilePath = "src/main/resource/settings.dat";
-        String csvUniformCubePath = "src/main/resource/2DCube.csv";
-        final String dataStreamsFilePath = "src/main/resource/dataStreams1.dat";
+        final String dataStreamsFilePath = "src/main/resource/dataStreams3.dat";
 
         // Scanner scanner = new Scanner(System.in);
         Map<String, String> variables = new HashMap<>();
@@ -30,83 +25,12 @@ public class DataStreamsCams {
             e.printStackTrace();
         }
          final int cubeSize = Integer.parseInt(variables.get("CUBE_SIZE"));
-        // CubeUniform cube = new CubeUniform(cubeSize, 5, 100);
-        // List<String> indexer = new ArrayList<>();
-        // int[][] uniformCube = cube.generateCube();
+
         final int FAN_OUT = Integer.parseInt(variables.get("FAN_OUT"));
 
-        // TreeNode treeOne = buildTree(cubeSize, FAN_OUT);
-        // TreeNode treeTwo = buildTree(cubeSize, FAN_OUT);
-        // // Print the tree
-        // printTree(treeOne, 0);
-        // System.out.println("*****************************");
-        // printTree(treeTwo, 0);
-
-        boolean close = false;
-
-        String line;
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 300000; i++) {
             generateDataStreamsCams(dataStreamsFilePath, cubeSize, FAN_OUT);
         }
-
-        // ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        // Runnable task = new Runnable() {
-        //     @Override
-        //     public void run() {
-        //         System.out.println("ADDING DATA STREAMS...");
-        //         generateDataStreamsCams(dataStreamsFilePath, cubeSize, FAN_OUT);
-        //     }
-        // };
-        // executor.scheduleAtFixedRate(task, 0, 10, TimeUnit.MILLISECONDS);
-        // try {
-           
-
-        //     // @SuppressWarnings("resource")
-        //     // BufferedReader reader = new BufferedReader(new FileReader(dataStreamsFilePath));
-        //     // while (!close) {
-        //     //     if ((line = reader.readLine()) != null) {
-
-        //     //         line = line.trim();
-        //     //         if (!line.isEmpty()) {
-        //     //             String[] parts = line.split(",", 3);
-        //     //             String D1 = parts[0].trim();
-        //     //             String D2 = parts[1].trim();
-        //     //             int UPDATE_VALUE = Integer.parseInt(parts[2].trim());
-
-        //     //             int ind1 = getIndex(treeOne, D1, indexer);
-        //     //             System.out.println("*******" + D1 + "******" + ind1);
-
-        //     //             // index = -1;
-        //     //             indexer = new ArrayList<>();
-        //     //             int ind2 = getIndex(treeTwo, D2, indexer);
-        //     //             System.out.println("*******" + D2 + "******" + ind2);
-
-        //     //             indexer = new ArrayList<>();
-
-        //     //             // uniformCube[ind2][ind1] = uniformCube[ind2][ind1] + UPDATE_VALUE;
-        //     //             // // update CSV file
-        //     //             // try (FileWriter writer = new FileWriter(csvUniformCubePath)) {
-        //     //             //     for (int i = 0; i < uniformCube.length; i++) {
-        //     //             //         for (int j = 0; j < uniformCube[i].length; j++) {
-        //     //             //             writer.append(Integer.toString(uniformCube[i][j]));
-        //     //             //             if (j < uniformCube[i].length - 1) {
-        //     //             //                 writer.append(',');
-        //     //             //             }
-        //     //             //         }
-        //     //             //         writer.append('\n');
-        //     //             //     }
-        //     //             //     System.out.println("waiting for data");
-        //     //             // } catch (IOException e) {
-        //     //             //     e.printStackTrace();
-        //     //             // }
-        //     //         }
-        //     //     } 
-        //     // }
-        // } catch (IOException e) {
-        //     close = true;
-        //     e.printStackTrace();
-        // }
-
     }
 
     // METHODS
@@ -172,73 +96,7 @@ public class DataStreamsCams {
         }
         return str.charAt(0) +str.substring(1, str.length()).replace(s, sub);
     }
-
-    ///// Print tree
-    public static void printNode(TreeNode node) {
-        printTree(node, 2);
-    }
-
-    private static void printTree(TreeNode node, int level) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < level; i++) {
-            sb.append("  ");
-        }
-        sb.append(node.getValue());
-        System.out.println(sb.toString());
-
-        for (TreeNode child : node.getChildren()) {
-            printTree(child, level + 1);
-        }
-    }
-
-    //////////////// BUILD TREE
-    public static TreeNode buildTree(int row, int fanOut) {
-        List<TreeNode> currentLevel = new ArrayList<>();
-        // Create leaf nodes for each element
-        for (int i = 0; i < row; i++) {
-            currentLevel.add(new TreeNode(finalGenerateSubRandomChars(charNum)));
-            charNum++;
-        }
-        while (currentLevel.size() > 1) {
-            List<TreeNode> nextLevel = new ArrayList<>();
-            // Pair up nodes to create parents
-            for (int i = 0; i < currentLevel.size(); i += fanOut) {
-                // Create parent node
-                TreeNode parent = new TreeNode(finalGenerateSubRandomChars(charNum));
-                charNum++;
-
-                if (i + fanOut > currentLevel.size()) {
-                    for (int j = i; j < currentLevel.size(); j++) {
-                        parent.addChild(currentLevel.get(j));
-                    }
-                } else {
-                    for (int j = i; j < i + fanOut; j++) {
-                        parent.addChild(currentLevel.get(j));
-                    }
-                }
-                nextLevel.add(parent);
-            }
-            currentLevel = nextLevel;
-        }
-        return currentLevel.get(0); // Return the root node
-    }
-
-    static int index = -1;
-
-    public static int getIndex(TreeNode node, String value, List<String> indexer) {
-        if (node.getChildren().size() == 0) {
-            if (node.getValue().equals(value)) {
-                index = indexer.size();
-            }
-            indexer.add(node.getValue());
-        } else {
-            for (TreeNode child : node.getChildren()) {
-                getIndex(child, value, indexer);
-            }
-        }
-        return index;
-    }
-
+  
     public static void generateDataStreamsCams(String dataStreamsFilePath, int cubeSize, int fanOut) {
         int x = (cubeSize / fanOut) + 1;
         int min = ((cubeSize / x+1) * fanOut)+cubeSize;

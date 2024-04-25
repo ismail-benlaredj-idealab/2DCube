@@ -14,16 +14,14 @@ public class Experiment {
     public static int charNum = 1;
     static final String settingsFilePath = "src/main/resource/settings.dat";
     static final String csvUniformCubePath = "src/main/resource/2DCube.csv";
-    static final String dataStreamsFilePath = "src/main/resource/dataStreams";
+    static final String dataStreamsFilePath = "src/main/resource/dataStreams1.dat";
     static final String heirarchyFilePath_1 = "src/main/resource/heirarchy_1.dat";
     static final String heirarchyFilePath_2 = "src/main/resource/heirarchy_2.dat";
     static final String resultsMemoSpaceFile = "src/main/resource/results.csv";
 
     public static void main(String[] args) {
         long beforeUsedMem = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024);
-
         int dataStreamsSize = 0;
-        // Scanner scanner = new Scanner(System.in);
         Map<String, String> variables = new HashMap<>();
         try {
             variables = readFile(settingsFilePath);
@@ -34,7 +32,7 @@ public class Experiment {
         final int UMIN = Integer.parseInt(variables.get("UMIN"));
         final int UMAX = Integer.parseInt(variables.get("UMAX"));
         CubeUniform cube = new CubeUniform(cubeSize, UMIN, UMAX);
-        // int[][] uniformCube = cube.generateCube();
+         int[][] uniformCube = cube.generateCube();
         List<String> indexer = new ArrayList<>();
         TreeNode treeOne = null, treeTwo = null;
         try {
@@ -45,15 +43,11 @@ public class Experiment {
         }
 
         boolean close = false;
-        BufferedReader reader;
-        for (int rep = 1; rep < 4; rep++) {
-            dataStreamsSize = 0;
-            int[][] uniformCube = cube.generateCube();
+        // for (int rep = 1; rep < 4; rep++) {
 
             try {
                 String line;
-                reader = new BufferedReader(new FileReader(dataStreamsFilePath + rep + ".dat"));
-            System.out.println("------------" + dataStreamsFilePath + rep + ".dat");
+                BufferedReader  reader = new BufferedReader(new FileReader(dataStreamsFilePath));
 
                 while (!close) {
                     if ((line = reader.readLine()) != null) {
@@ -102,8 +96,7 @@ public class Experiment {
                 e.printStackTrace();
             }
 
-            long afterUsedMem = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())
-                    / (1024 * 1024);
+            long afterUsedMem = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/ (1024 * 1024);
             long actualMemUsed = afterUsedMem - beforeUsedMem;
 
             try (FileWriter fileWriter = new FileWriter(resultsMemoSpaceFile, true)) {
@@ -117,10 +110,10 @@ public class Experiment {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("beforeUsedMem " + beforeUsedMem);
+            System.out.println("beforeUsedMem " + beforeUsedMem+"****"+"afterUsedMem " + afterUsedMem);
             System.out.println("Memory used: " + actualMemUsed);
-            close = false;
-        }
+            // close = false;
+        // }
     }
 
     // METHODS
