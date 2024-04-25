@@ -31,8 +31,9 @@ public class DataStructure {
         cube.generateCube();
 
         final int FAN_OUT = Integer.parseInt(variables.get("FAN_OUT"));
-        TreeNode treeOne = buildTree(cubeSize, FAN_OUT);
-        TreeNode treeTwo = buildTree(cubeSize, FAN_OUT);
+        final int DEPTH = Integer.parseInt(variables.get("DEPTH"));
+        TreeNode treeOne = buildTree(cubeSize,FAN_OUT,DEPTH);
+        TreeNode treeTwo = buildTree(cubeSize,FAN_OUT,DEPTH);
         // Print the tree
         printTree(treeOne, 0, heirarchyFilePath_1);
         System.out.println("*****************************");
@@ -71,7 +72,7 @@ public class DataStructure {
             sb.append("  ");
         }
         sb.append(node.getValue());
-        System.out.println(sb.toString());
+        // System.out.println(sb.toString());
         try (FileWriter fileWriter = new FileWriter(heirarchyFilePath, true)) {
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write(sb.toString());
@@ -87,7 +88,7 @@ public class DataStructure {
     }
 
     //////////////// BUILD TREE
-    public static TreeNode buildTree(int row, int fanOut) {
+    public static TreeNode buildTree(int row, int fanOut, int depth) {
         List<TreeNode> currentLevel = new ArrayList<>();
         // Create leaf nodes for each element
         for (int i = 0; i < row; i++) {
@@ -111,6 +112,14 @@ public class DataStructure {
                     }
                 }
                 nextLevel.add(parent);
+                if(i<1){
+                    int size=row/fanOut+1;
+                    System.out.println();
+                    fanOut = ((int) Math.pow(size, 1/depth))+1;
+                    System.out.println("-----//"+ depth);
+                    depth--;
+
+                }
             }
             currentLevel = nextLevel;
         }
