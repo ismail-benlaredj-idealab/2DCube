@@ -18,15 +18,15 @@ public class Experiment {
     public static int charNum = 1;
 
     public static void main(String[] args) {
-        long beforeUsedMem=(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/ (1024 * 1024);
-        
+        long beforeUsedMem = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024);
+
         String settingsFilePath = "src/main/resource/settings.dat";
         String csvUniformCubePath = "src/main/resource/2DCube.csv";
         final String dataStreamsFilePath = "src/main/resource/dataStreams.dat";
         final String heirarchyFilePath_1 = "src/main/resource/heirarchy_1.dat";
         final String heirarchyFilePath_2 = "src/main/resource/heirarchy_2.dat";
         final String resultsMemoSpaceFile = "src/main/resource/results.csv";
-int dataStreamsSize = 0;
+        int dataStreamsSize = 0;
         // Scanner scanner = new Scanner(System.in);
         Map<String, String> variables = new HashMap<>();
         try {
@@ -38,9 +38,9 @@ int dataStreamsSize = 0;
         CubeUniform cube = new CubeUniform(cubeSize, 5, 100);
         List<String> indexer = new ArrayList<>();
         int[][] uniformCube = cube.generateCube();
-        TreeNode treeOne = null ,treeTwo=null;
+        TreeNode treeOne = null, treeTwo = null;
         try {
-            treeOne =  readHeirarchies(heirarchyFilePath_1);
+            treeOne = readHeirarchies(heirarchyFilePath_1);
             treeTwo = readHeirarchies(heirarchyFilePath_2);
         } catch (IOException e) {
             e.printStackTrace();
@@ -88,7 +88,7 @@ int dataStreamsSize = 0;
                             e.printStackTrace();
                         }
                     }
-                }else{
+                } else {
                     close = true;
                 }
             }
@@ -96,9 +96,9 @@ int dataStreamsSize = 0;
             close = true;
             e.printStackTrace();
         }
-        long afterUsedMem=(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory()) / (1024 * 1024);
-        System.out.println(afterUsedMem+"/////"+ beforeUsedMem);
-        long actualMemUsed=afterUsedMem-beforeUsedMem;
+        long afterUsedMem = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024);
+        System.out.println(afterUsedMem + "/////" + beforeUsedMem);
+        long actualMemUsed = afterUsedMem - beforeUsedMem;
 
         try (FileWriter fileWriter = new FileWriter(resultsMemoSpaceFile, true)) {
 
@@ -112,7 +112,7 @@ int dataStreamsSize = 0;
             e.printStackTrace();
         }
         System.out.println("beforeUsedMem " + beforeUsedMem);
-        System.out.println("Memory used: "+actualMemUsed);
+        System.out.println("Memory used: " + actualMemUsed);
     }
 
     // METHODS
@@ -210,8 +210,6 @@ int dataStreamsSize = 0;
         }
         return reapet + result;
     }
-
-
 
     static int index = -1;
 
