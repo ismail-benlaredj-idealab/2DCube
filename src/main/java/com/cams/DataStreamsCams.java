@@ -20,7 +20,7 @@ public class DataStreamsCams {
     public static void main(String[] args) {
         String settingsFilePath = "src/main/resource/settings.dat";
         String csvUniformCubePath = "src/main/resource/2DCube.csv";
-        final String dataStreamsFilePath = "src/main/resource/dataStreams.dat";
+        final String dataStreamsFilePath = "src/main/resource/dataStreams1.dat";
 
         // Scanner scanner = new Scanner(System.in);
         Map<String, String> variables = new HashMap<>();
@@ -45,19 +45,19 @@ public class DataStreamsCams {
         boolean close = false;
 
         String line;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100000; i++) {
             generateDataStreamsCams(dataStreamsFilePath, cubeSize, FAN_OUT);
         }
 
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        Runnable task = new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("ADDING DATA STREAMS...");
-                generateDataStreamsCams(dataStreamsFilePath, cubeSize, FAN_OUT);
-            }
-        };
-        executor.scheduleAtFixedRate(task, 0, 10, TimeUnit.MILLISECONDS);
+        // ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        // Runnable task = new Runnable() {
+        //     @Override
+        //     public void run() {
+        //         System.out.println("ADDING DATA STREAMS...");
+        //         generateDataStreamsCams(dataStreamsFilePath, cubeSize, FAN_OUT);
+        //     }
+        // };
+        // executor.scheduleAtFixedRate(task, 0, 10, TimeUnit.MILLISECONDS);
         // try {
            
 
@@ -134,7 +134,7 @@ public class DataStreamsCams {
         return variables;
     }
 
-    public static String generateRandomChars(int number) {
+    public static String generateSubRandomChars(int number) {
         String result = "";
         String reapet = "";
         int base = 26;
@@ -154,6 +154,23 @@ public class DataStreamsCams {
             count++;
         }
         return reapet + result;
+    }
+    public static String finalGenerateSubRandomChars(int number) {
+        String str = generateSubRandomChars(number);
+        String s = "";
+        String sub = "";
+        for (int i = 1; i < str.length() - 1; i++) {
+            if (str.charAt(i) == 'A' && str.charAt(i - 1) == 'A') {
+                s += str.charAt(i);
+            } else {
+                s = "";
+            }
+        }
+        if (s.length() > 0) {
+            sub = generateSubRandomChars(s.length()-1);
+          s= str.substring(1, s.length());
+        }
+        return str.charAt(0) +str.substring(1, str.length()).replace(s, sub);
     }
 
     ///// Print tree
@@ -179,7 +196,7 @@ public class DataStreamsCams {
         List<TreeNode> currentLevel = new ArrayList<>();
         // Create leaf nodes for each element
         for (int i = 0; i < row; i++) {
-            currentLevel.add(new TreeNode(generateRandomChars(charNum)));
+            currentLevel.add(new TreeNode(finalGenerateSubRandomChars(charNum)));
             charNum++;
         }
         while (currentLevel.size() > 1) {
@@ -187,7 +204,7 @@ public class DataStreamsCams {
             // Pair up nodes to create parents
             for (int i = 0; i < currentLevel.size(); i += fanOut) {
                 // Create parent node
-                TreeNode parent = new TreeNode(generateRandomChars(charNum));
+                TreeNode parent = new TreeNode(finalGenerateSubRandomChars(charNum));
                 charNum++;
 
                 if (i + fanOut > currentLevel.size()) {
@@ -232,10 +249,10 @@ public class DataStreamsCams {
 
             Random random = new Random();
             int randomCharNum = random.nextInt(cubeSize) + 1;
-            String D1 = generateRandomChars(randomCharNum);
+            String D1 = finalGenerateSubRandomChars(randomCharNum);
             randomCharNum = random.nextInt((max - min+1) + 1) + min;
             System.out.println("/-/-/-/-/-/-/--/--/" + D1);
-            String D2 = generateRandomChars(randomCharNum);
+            String D2 = finalGenerateSubRandomChars(randomCharNum);
             System.out.println("/-/-/-/-/-/-/--/--/" + D2);
             int UPDATE_VALUE = random.nextInt((1000 - 900) + 1) + 900;
             bufferedWriter.write(D1 + "," + D2 + "," + UPDATE_VALUE);

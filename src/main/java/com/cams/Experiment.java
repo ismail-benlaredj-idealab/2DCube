@@ -9,23 +9,19 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.FileWriter;
-import java.util.Random;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class Experiment {
     public static int charNum = 1;
+    static final String settingsFilePath = "src/main/resource/settings.dat";
+    static final String csvUniformCubePath = "src/main/resource/2DCube.csv";
+    static final String dataStreamsFilePath = "src/main/resource/dataStreams";
+    static final String heirarchyFilePath_1 = "src/main/resource/heirarchy_1.dat";
+    static final String heirarchyFilePath_2 = "src/main/resource/heirarchy_2.dat";
+    static final String resultsMemoSpaceFile = "src/main/resource/results.csv";
 
     public static void main(String[] args) {
         long beforeUsedMem = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024);
 
-        String settingsFilePath = "src/main/resource/settings.dat";
-        String csvUniformCubePath = "src/main/resource/2DCube.csv";
-        final String dataStreamsFilePath = "src/main/resource/dataStreams.dat";
-        final String heirarchyFilePath_1 = "src/main/resource/heirarchy_1.dat";
-        final String heirarchyFilePath_2 = "src/main/resource/heirarchy_2.dat";
-        final String resultsMemoSpaceFile = "src/main/resource/results.csv";
         int dataStreamsSize = 0;
         // Scanner scanner = new Scanner(System.in);
         Map<String, String> variables = new HashMap<>();
@@ -35,9 +31,11 @@ public class Experiment {
             e.printStackTrace();
         }
         final int cubeSize = Integer.parseInt(variables.get("CUBE_SIZE"));
-        CubeUniform cube = new CubeUniform(cubeSize, 5, 100);
+        final int UMIN = Integer.parseInt(variables.get("UMIN"));
+        final int UMAX = Integer.parseInt(variables.get("UMAX"));
+        CubeUniform cube = new CubeUniform(cubeSize, UMIN, UMAX);
+        // int[][] uniformCube = cube.generateCube();
         List<String> indexer = new ArrayList<>();
-        int[][] uniformCube = cube.generateCube();
         TreeNode treeOne = null, treeTwo = null;
         try {
             treeOne = readHeirarchies(heirarchyFilePath_1);
@@ -45,74 +43,84 @@ public class Experiment {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         boolean close = false;
-        try {
-            String line;
+        BufferedReader reader;
+        for (int rep = 1; rep < 4; rep++) {
+            dataStreamsSize = 0;
+            int[][] uniformCube = cube.generateCube();
 
-            @SuppressWarnings("resource")
-            BufferedReader reader = new BufferedReader(new FileReader(dataStreamsFilePath));
-            while (!close) {
-                if ((line = reader.readLine()) != null) {
-                    dataStreamsSize++;
-                    line = line.trim();
-                    if (!line.isEmpty()) {
-                        String[] parts = line.split(",", 3);
-                        String D1 = parts[0].trim();
-                        String D2 = parts[1].trim();
-                        int UPDATE_VALUE = Integer.parseInt(parts[2].trim());
+            try {
+                String line;
+                reader = new BufferedReader(new FileReader(dataStreamsFilePath + rep + ".dat"));
+            System.out.println("------------" + dataStreamsFilePath + rep + ".dat");
 
-                        int ind1 = getIndex(treeOne, D1, indexer);
-                        // System.out.println("*******" + D1 + "******" + ind1);
+                while (!close) {
+                    if ((line = reader.readLine()) != null) {
+                        dataStreamsSize++;
+                        line = line.trim();
+                        if (!line.isEmpty()) {
+                            String[] parts = line.split(",", 3);
+                            String D1 = parts[0].trim();
+                            String D2 = parts[1].trim();
+                            int UPDATE_VALUE = Integer.parseInt(parts[2].trim());
 
-                        // index = -1;
-                        indexer = new ArrayList<>();
-                        int ind2 = getIndex(treeTwo, D2, indexer);
-                        // System.out.println("*******" + D2 + "******" + ind2);
+                            int ind1 = getIndex(treeOne, D1, indexer);
+                            // System.out.println("*******" + D1 + "******" + ind1);
 
-                        indexer = new ArrayList<>();
+                            // index = -1;
+                            indexer = new ArrayList<>();
+                            int ind2 = getIndex(treeTwo, D2, indexer);
+                            // System.out.println("*******" + D2 + "******" + ind2);
 
-                        uniformCube[ind2][ind1] = uniformCube[ind2][ind1] + UPDATE_VALUE;
-                        // update CSV file
-                        try (FileWriter writer = new FileWriter(csvUniformCubePath)) {
-                            for (int i = 0; i < uniformCube.length; i++) {
-                                for (int j = 0; j < uniformCube[i].length; j++) {
-                                    writer.append(Integer.toString(uniformCube[i][j]));
-                                    if (j < uniformCube[i].length - 1) {
-                                        writer.append(',');
-                                    }
-                                }
-                                writer.append('\n');
-                            }
-                            System.out.println("waiting for data");
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                            indexer = new ArrayList<>();
+
+                            uniformCube[ind2][ind1] = uniformCube[ind2][ind1] + UPDATE_VALUE;
+                            System.out.println("Reading Data Steams...");
                         }
+                    } else {
+                        close = true;
                     }
-                } else {
-                    close = true;
                 }
+                   // update CSV file
+                   try (FileWriter writer = new FileWriter(csvUniformCubePath)) {
+                    for (int i = 0; i < uniformCube.length; i++) {
+                        for (int j = 0; j < uniformCube[i].length; j++) {
+                            writer.append(Integer.toString(uniformCube[i][j]));
+                            if (j < uniformCube[i].length - 1) {
+                                writer.append(',');
+                            }
+                        }
+                        writer.append('\n');
+                    }
+                    // System.out.println("waiting for data");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } catch (IOException e) {
+                close = true;
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            close = true;
-            e.printStackTrace();
+
+            long afterUsedMem = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())
+                    / (1024 * 1024);
+            long actualMemUsed = afterUsedMem - beforeUsedMem;
+
+            try (FileWriter fileWriter = new FileWriter(resultsMemoSpaceFile, true)) {
+
+                BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+                bufferedWriter.write(dataStreamsSize + "," + actualMemUsed);
+                bufferedWriter.newLine();
+                bufferedWriter.close();
+                fileWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("beforeUsedMem " + beforeUsedMem);
+            System.out.println("Memory used: " + actualMemUsed);
+            close = false;
         }
-        long afterUsedMem = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024);
-        System.out.println(afterUsedMem + "/////" + beforeUsedMem);
-        long actualMemUsed = afterUsedMem - beforeUsedMem;
-
-        try (FileWriter fileWriter = new FileWriter(resultsMemoSpaceFile, true)) {
-
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-
-            bufferedWriter.write(dataStreamsSize + "," + actualMemUsed);
-            bufferedWriter.newLine();
-            bufferedWriter.close();
-            fileWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("beforeUsedMem " + beforeUsedMem);
-        System.out.println("Memory used: " + actualMemUsed);
     }
 
     // METHODS
@@ -164,8 +172,6 @@ public class Experiment {
                 } else if (value == nodeOrder) {
                     if (prev == 1) {
                         listOfNodes.remove(listOfNodes.size() - 1);
-                        System.out.println(parts[nodeOrder - 1]);
-
                     }
                     prev = 0;
                     TreeNode tree = new TreeNode(parts[nodeOrder - 1]);

@@ -94,14 +94,14 @@ public class DataStructure {
         List<TreeNode> currentLevel = new ArrayList<>();
         // Create leaf nodes for each element
         for (int i = 0; i < row; i++) {
-            currentLevel.add(new TreeNode(generateRandomChars(charNum)));
+            currentLevel.add(new TreeNode(finalGenerateSubRandomChars(charNum)));
             charNum++;
         }
         while (currentLevel.size() > 1) {
             List<TreeNode> nextLevel = new ArrayList<>();
             for (int i = 0; i < currentLevel.size(); i += fanOut) {
                 // Create parent node
-                TreeNode parent = new TreeNode(generateRandomChars(charNum));
+                TreeNode parent = new TreeNode(finalGenerateSubRandomChars(charNum));
                 charNum++;
 
                 if (i + fanOut > currentLevel.size()) {
@@ -119,14 +119,13 @@ public class DataStructure {
             if(depth>1){
                 depth--;
                     int size=row/fanOut+1;
-                    System.out.println();
                     fanOut = ((int) Math.pow(size, 1/depth))+1;
                 }
         }
         return currentLevel.get(0); // Return the root node
     }
 
-    public static String generateRandomChars(int number) {
+    public static String generateSubRandomChars(int number) {
         String result = "";
         String reapet = "";
         int base = 26;
@@ -146,5 +145,23 @@ public class DataStructure {
             count++;
         }
         return reapet + result;
+    }
+
+    public static String finalGenerateSubRandomChars(int number) {
+        String str = generateSubRandomChars(number);
+        String s = "";
+        String sub = "";
+        for (int i = 1; i < str.length() - 1; i++) {
+            if (str.charAt(i) == 'A' && str.charAt(i - 1) == 'A') {
+                s += str.charAt(i);
+            } else {
+                s = "";
+            }
+        }
+        if (s.length() > 0) {
+            sub = generateSubRandomChars(s.length()-1);
+          s= str.substring(1, s.length());
+        }
+        return str.charAt(0) +str.substring(1, str.length()).replace(s, sub);
     }
 }
