@@ -20,7 +20,7 @@ public class Experiment {
     static final String resultsMemoSpaceFile = "src/main/resource/results.csv";
 
     public static void main(String[] args) {
-        long beforeUsedMem = Runtime.getRuntime().maxMemory() / (1024 * 1024);
+        long beforeUsedMem = ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) /(1024*1024);
         int dataStreamsSize = 0;
         Map<String, String> variables = new HashMap<>();
         try {
@@ -96,8 +96,8 @@ public class Experiment {
                 e.printStackTrace();
             }
 
-            long afterUsedMem = Runtime.getRuntime().maxMemory()/ (1024 * 1024);
-            long actualMemUsed = beforeUsedMem-afterUsedMem;
+            long afterUsedMem = ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) /(1024*1024);
+            long actualMemUsed = afterUsedMem - beforeUsedMem;
 
             try (FileWriter fileWriter = new FileWriter(resultsMemoSpaceFile, true)) {
 
