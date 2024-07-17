@@ -1,5 +1,5 @@
 package com.cams;
- 
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -9,13 +9,12 @@ import java.util.Map;
 import java.io.FileWriter;
 import java.util.Random;
 
-
 public class DataStreamsCams {
     public static int charNum = 1;
-
+    
     public static void main(String[] args) {
         String settingsFilePath = "src/main/resource/settings.dat";
-        final String dataStreamsFilePath = "src/main/resource/dataStreams4.dat";
+        final String dataStreamsFilePath = "src/main/resource/dataStreams";
 
         // Scanner scanner = new Scanner(System.in);
         Map<String, String> variables = new HashMap<>();
@@ -24,12 +23,14 @@ public class DataStreamsCams {
         } catch (IOException e) {
             e.printStackTrace();
         }
-         final int cubeSize = Integer.parseInt(variables.get("CUBE_SIZE"));
+        final int cubeSize = Integer.parseInt(variables.get("CUBE_SIZE"));
 
         final int FAN_OUT = Integer.parseInt(variables.get("FAN_OUT"));
-
-        for (int i = 0; i < 400000; i++) {
-            generateDataStreamsCams(dataStreamsFilePath, cubeSize, FAN_OUT);
+        for (int j = 1; j < 2; j ++) {
+            System.out.println("Generating data stream: " + j);
+            for (int i = 0; i < j * 10000; i++) {
+                generateDataStreamsCams(dataStreamsFilePath + j + ".dat", cubeSize, FAN_OUT);
+            }
         }
     }
 
@@ -79,6 +80,7 @@ public class DataStreamsCams {
         }
         return reapet + result;
     }
+
     public static String finalGenerateSubRandomChars(int number) {
         String str = generateSubRandomChars(number);
         String s = "";
@@ -91,15 +93,15 @@ public class DataStreamsCams {
             }
         }
         if (s.length() > 0) {
-            sub = generateSubRandomChars(s.length()-1);
-          s= str.substring(1, s.length());
+            sub = generateSubRandomChars(s.length() - 1);
+            s = str.substring(1, s.length());
         }
-        return str.charAt(0) +str.substring(1, str.length()).replace(s, sub);
+        return str.charAt(0) + str.substring(1, str.length()).replace(s, sub);
     }
-  
+
     public static void generateDataStreamsCams(String dataStreamsFilePath, int cubeSize, int fanOut) {
         int x = (cubeSize / fanOut) + 1;
-        int min = ((cubeSize / x+1) * fanOut)+cubeSize;
+        int min = ((cubeSize / x + 1) * fanOut) + cubeSize;
         int max = min + cubeSize;
         try (FileWriter fileWriter = new FileWriter(dataStreamsFilePath, true)) {
 
@@ -108,10 +110,10 @@ public class DataStreamsCams {
             Random random = new Random();
             int randomCharNum = random.nextInt(cubeSize) + 1;
             String D1 = finalGenerateSubRandomChars(randomCharNum);
-            randomCharNum = random.nextInt((max - min+1) + 1) + min;
-            System.out.println("/-/-/-/-/-/-/--/--/" + D1);
+            randomCharNum = random.nextInt((max - min + 1) + 1) + min;
+            // System.out.println("/-/-/-/-/-/-/--/--/" + D1);
             String D2 = finalGenerateSubRandomChars(randomCharNum);
-            System.out.println("/-/-/-/-/-/-/--/--/" + D2);
+             System.out.println("/-/-/-/-/-/-/--/--/" + D2);
             int UPDATE_VALUE = random.nextInt((1000 - 900) + 1) + 900;
             bufferedWriter.write(D1 + "," + D2 + "," + UPDATE_VALUE);
             bufferedWriter.newLine();
